@@ -1,0 +1,135 @@
+
+@apiUrl = http://localhost:8080
+
+# Get stores
+GET {{apiUrl}}/stores
+
+###
+
+# Create a store
+POST {{apiUrl}}/stores 
+Content-Type: application/json
+
+
+{
+    "name": "FGA Demo Store"
+}
+
+###
+
+# Configure authorization model
+POST {{apiUrl}}/stores/01HRFS4GRNFFM8GHYEB63CV19K/authorization-models
+Content-Type: application/json
+
+
+{
+  "schema_version": "1.1",
+  "type_definitions": [
+    {
+      "type": "user",
+      "relations": {},
+      "metadata": null
+    },
+    {
+      "type": "document",
+      "relations": {
+        "reader": {
+          "this": {}
+        },
+        "writer": {
+          "this": {}
+        },
+        "owner": {
+          "this": {}
+        }
+      },
+      "metadata": {
+        "relations": {
+          "reader": {
+            "directly_related_user_types": [
+              {
+                "type": "user"
+              }
+            ]
+          },
+          "writer": {
+            "directly_related_user_types": [
+              {
+                "type": "user"
+              }
+            ]
+          },
+          "owner": {
+            "directly_related_user_types": [
+              {
+                "type": "user"
+              }
+            ]
+          }
+        }
+      }
+    }
+  ]
+}
+
+###
+
+# Get all the authorization models
+GET {{apiUrl}}/stores/01HRFS4GRNFFM8GHYEB63CV19K/authorization-models
+
+###
+
+# Add new relationship tuple
+POST {{apiUrl}}/stores/01HRFS4GRNFFM8GHYEB63CV19K/write
+Content-Type: application/json
+
+
+{
+    "writes": { 
+        "tuple_keys" : [
+            {
+                "user":"user:anne",
+                "relation":"reader",
+                "object":"document:Z"
+                }
+        ] 
+    }, 
+    "authorization_model_id": "01HRFSFYFNGW9R9DD3M2K7XGZ9"
+}
+
+###
+
+# Return a list of all tuple changes
+GET {{apiUrl}}/stores/01HRFS4GRNFFM8GHYEB63CV19K/changes
+
+###
+
+# Get tuples from teh store that matches a query
+POST {{apiUrl}}/stores/01HRFS4GRNFFM8GHYEB63CV19K/read
+Content-Type: application/json
+
+
+{
+ "tuple_key": {
+     "user": "user:anne",
+     "relation": "reader",
+     "object": "document:"
+  }
+}
+
+###
+
+# Check
+
+POST  {{apiUrl}}/stores/01HRFS4GRNFFM8GHYEB63CV19K/check
+Content-Type: application/json
+
+
+{
+    "authorization_model_id": "01HRFSFYFNGW9R9DD3M2K7XGZ9",
+    "tuple_key": {
+        "user":"user:anne",
+        "relation":"reader",
+        "object":"document:Z"
+    }
+}
