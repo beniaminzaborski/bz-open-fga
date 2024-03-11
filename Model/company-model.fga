@@ -1,0 +1,15 @@
+model
+  schema 1.1
+
+type user
+  relations
+    define manager: [user]
+
+type organisationItem
+  relations
+    define parent: [organisationItem, user]
+
+type timesheet
+  relations
+    define owner: [user]
+    define can_approve: manager from owner

@@ -1,0 +1,283 @@
+
+@apiUrl = http://localhost:8080
+
+# Get stores
+GET {{apiUrl}}/stores
+
+###
+
+# Create a store
+POST {{apiUrl}}/stores 
+Content-Type: application/json
+
+
+{
+    "name": "Company XYZ Store"
+}
+
+###
+
+# Configure authorization model
+POST {{apiUrl}}/stores/01HRQJ2BAEHYNH8VN4EGXBBYF4/authorization-models
+Content-Type: application/json
+
+
+{
+  "schema_version": "1.1",
+  "type_definitions": [
+    {
+      "type": "user",
+      "relations": {
+        "manager": {
+          "this": {}
+        }
+      },
+      "metadata": {
+        "relations": {
+          "manager": {
+            "directly_related_user_types": [
+              {
+                "type": "user"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "type": "organisationItem",
+      "relations": {
+        "parent": {
+          "this": {}
+        }
+      },
+      "metadata": {
+        "relations": {
+          "parent": {
+            "directly_related_user_types": [
+              {
+                "type": "organisationItem"
+              },
+              {
+                "type": "user"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "type": "timesheet",
+      "relations": {
+        "owner": {
+          "this": {}
+        },
+        "can_approve": {
+          "tupleToUserset": {
+            "computedUserset": {
+              "relation": "manager"
+            },
+            "tupleset": {
+              "relation": "owner"
+            }
+          }
+        }
+      },
+      "metadata": {
+        "relations": {
+          "owner": {
+            "directly_related_user_types": [
+              {
+                "type": "user"
+              }
+            ]
+          },
+          "can_approve": {
+            "directly_related_user_types": []
+          }
+        }
+      }
+    }
+  ]
+}
+
+###
+
+# Get all the authorization models
+GET {{apiUrl}}/stores/01HRQJ2BAEHYNH8VN4EGXBBYF4/authorization-models
+
+###
+
+# Add new relationship tuple
+POST {{apiUrl}}/stores/01HRQJ2BAEHYNH8VN4EGXBBYF4/write
+Content-Type: application/json
+
+
+{
+    "writes": { 
+        "tuple_keys" : [
+            {
+                "user":"user:alan",
+                "relation":"manager",
+                "object":"user:ceo"
+            }, 
+            {
+                "user":"user:ben",
+                "relation":"manager",
+                "object":"user:ceo"
+            },
+            {
+                "user":"user:cindy",
+                "relation":"manager",
+                "object":"user:ceo"
+            },
+            {
+                "user":"user:dylan",
+                "relation":"manager",
+                "object":"user:alan"
+            },
+            {
+                "user":"user:ellen",
+                "relation":"manager",
+                "object":"user:ben"
+            },
+            {
+                "user":"user:felicia",
+                "relation":"manager",
+                "object":"user:cindy"
+            },
+            {
+                "user":"user:greg",
+                "relation":"manager",
+                "object":"user:dylan"
+            },
+            {
+                "user":"user:hannh",
+                "relation":"manager",
+                "object":"user:ellen"
+            },
+            {
+                "user":"user:igy",
+                "relation":"manager",
+                "object":"user:felicia"
+            },
+            {
+                "user":"user:igy",
+                "relation":"owner",
+                "object":"timesheet:igy-2024-01"
+            }
+        ]
+    }, 
+    "authorization_model_id": "01HRQJ3AWTZ5B2KZRC9264YMYB"
+}
+
+###
+
+# Return a list of all tuple changes
+GET {{apiUrl}}/stores/01HRQJ2BAEHYNH8VN4EGXBBYF4/changes
+
+###
+
+# Get tuples from teh store that matches a query
+POST {{apiUrl}}/stores/01HRQJ2BAEHYNH8VN4EGXBBYF4/read
+Content-Type: application/json
+
+
+{
+ "tuple_key": {
+     "user": "user:igy",
+     "relation": "manager",
+     "object": "user:"
+  }
+}
+
+###
+
+# Get tuples from teh store that matches a query
+POST {{apiUrl}}/stores/01HRQJ2BAEHYNH8VN4EGXBBYF4/read
+Content-Type: application/json
+
+
+{
+ "tuple_key": {
+     "user": "user:igy",
+     "relation": "owner",
+     "object": "timesheet:"
+  }
+}
+
+###
+
+# Check
+
+POST  {{apiUrl}}/stores/01HRQJ2BAEHYNH8VN4EGXBBYF4/check
+Content-Type: application/json
+
+
+{
+    "authorization_model_id": "01HRQJ3AWTZ5B2KZRC9264YMYB",
+    "tuple_key": {
+        "user":"user:igy",
+        "relation":"manager",
+        "object":"user:felicia"
+    }
+}
+
+###
+
+# Check
+
+POST  {{apiUrl}}/stores/01HRQJ2BAEHYNH8VN4EGXBBYF4/check
+Content-Type: application/json
+
+
+{
+    "authorization_model_id": "01HRQJ3AWTZ5B2KZRC9264YMYB",
+    "tuple_key": {
+        "user":"user:igy",
+        "relation":"manager",
+        "object":"user:ellen"
+    }
+}
+
+###
+
+# Check
+
+POST  {{apiUrl}}/stores/01HRQJ2BAEHYNH8VN4EGXBBYF4/check
+Content-Type: application/json
+
+
+{
+    "authorization_model_id": "01HRQJ3AWTZ5B2KZRC9264YMYB",
+    "tuple_key": {
+        "user":"user:igy",
+        "relation":"can_approve",
+        "object":"timesheet:igy-2024-01"
+    }
+}
+
+###
+
+# Check
+
+POST  {{apiUrl}}/stores/01HRQJ2BAEHYNH8VN4EGXBBYF4/check
+Content-Type: application/json
+
+
+{
+    "authorization_model_id": "01HRQJ3AWTZ5B2KZRC9264YMYB",
+    "tuple_key": {
+        "user":"user:felicia",
+        "relation":"can_approve",
+        "object":"timesheet:igy-2024-01"
+    }
+}
+
+###
+
+# Delete the store
+
+DELETE   {{apiUrl}}/stores/01HRQJ2BAEHYNH8VN4EGXBBYF4
+
+###
